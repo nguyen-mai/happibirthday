@@ -56,16 +56,16 @@
     const music = document.getElementById('music');
 
     arLink.addEventListener('click', () => {
-      // Bắt đầu phát nhạc nhẹ khi người dùng mở hộp
+      // Phát nhạc nhẹ khi mở AR
       music.play().catch(() => {
-        console.warn('Trình duyệt chặn autoplay. Nhạc sẽ phát khi người dùng tương tác thêm.');
+        console.warn('⚠️ Autoplay bị chặn — nhạc sẽ phát sau khi người dùng tương tác.');
       });
 
-      // Sau 6 giây (giả lập người dùng tap hộp quà)
+      // Khi người dùng đóng Quick Look (AR), trang web sẽ trở lại.
+      // Ta kiểm tra thời gian 20s, nếu quay lại thì redirect.
       setTimeout(() => {
-        // Mở video chúc mừng trên Canva
         window.location.href = "https://www.canva.com/design/DAG2_6J5SiI/OrIu10kMRDhHSgkCL61K7Q/watch";
-      }, 20000);
+      }, 20000); // 20 giây
     });
   </script>
 
