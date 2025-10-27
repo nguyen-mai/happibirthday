@@ -1,118 +1,73 @@
 <!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Chúc mừng sinh nhật 🎁</title>
-    <script
-      type="module"
-      src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"
-    ></script>
-    <style>
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        background: black;
-        height: 100%;
-        overflow: hidden;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chúc mừng sinh nhật 🎂</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: radial-gradient(circle, #ffe9f0, #ffd6e0);
+      text-align: center;
+      overflow: hidden;
+    }
+    h1 {
+      color: #ff0055;
+      margin-top: 5vh;
+      font-size: 2em;
+      animation: fadeIn 2s ease;
+    }
+    #ar-button {
+      margin-top: 40vh;
+      background: #ff4081;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 30px;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #ar-button:hover {
+      background: #ff0055;
+      transform: scale(1.05);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
 
-      model-viewer {
-        width: 100%;
-        height: 100%;
-        transition: opacity 1s ease;
-      }
+  <h1>Chúc mừng sinh nhật 🎉</h1>
 
-      #video-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: black;
-        display: none;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        z-index: 10;
-      }
+  <!-- Nút mở mô hình AR -->
+  <a rel="ar" href="giftbox.usdz" id="ar-link">
+    <button id="ar-button">Mở hộp quà 🎁</button>
+  </a>
 
-      #birthday-video {
-        width: 90%;
-        height: auto;
-        max-height: 80%;
-        border-radius: 12px;
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-      }
+  <!-- Âm nhạc tùy chọn -->
+  <audio id="music" src="music.mp3"></audio>
 
-      #close-btn {
-        margin-top: 20px;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 25px;
-        background: #ff4081;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
+  <script>
+    const arLink = document.getElementById('ar-link');
+    const music = document.getElementById('music');
 
-      #close-btn:hover {
-        background: #ff0055;
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Hộp quà 3D -->
-    <model-viewer
-      id="giftBox"
-      src="giftbox.usdz"
-      ar
-      ar-modes="scene-viewer quick-look webxr"
-      camera-controls
-      autoplay
-      shadow-intensity="1"
-      exposure="1"
-    ></model-viewer>
-
-    <!-- Video ẩn -->
-    <div id="video-container">
-      <video id="birthday-video" controls playsinline>
-        <source
-          src="https://www.canva.com/design/DAG2_6J5SiI/OrIu10kMRDhHSgkCL61K7Q/watch?utm_content=DAG2_6J5SiI&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=ha5c24aba18"
-          type="video/mp4"
-        />
-        Trình duyệt của bạn không hỗ trợ video.
-      </video>
-      <button id="close-btn">🎁 Quay lại hộp quà</button>
-    </div>
-
-    <script>
-      const giftBox = document.getElementById("giftBox");
-      const videoContainer = document.getElementById("video-container");
-      const video = document.getElementById("birthday-video");
-      const closeBtn = document.getElementById("close-btn");
-
-      // Khi người dùng chạm vào hộp quà
-      giftBox.addEventListener("click", () => {
-        // Làm mờ hộp quà
-        giftBox.style.opacity = "0";
-        setTimeout(() => {
-          giftBox.style.display = "none";
-          videoContainer.style.display = "flex";
-          video.play();
-        }, 800);
+    arLink.addEventListener('click', () => {
+      // Bắt đầu phát nhạc nhẹ khi người dùng mở hộp
+      music.play().catch(() => {
+        console.warn('Trình duyệt chặn autoplay. Nhạc sẽ phát khi người dùng tương tác thêm.');
       });
 
-      // Nút quay lại hộp quà
-      closeBtn.addEventListener("click", () => {
-        video.pause();
-        videoContainer.style.display = "none";
-        giftBox.style.display = "block";
-        setTimeout(() => {
-          giftBox.style.opacity = "1";
-        }, 100);
-      });
-    </script>
-  </body>
+      // Sau 6 giây (giả lập người dùng tap hộp quà)
+      setTimeout(() => {
+        // Mở video chúc mừng trên Canva
+        window.location.href = "https://www.canva.com/design/DAG2_6J5SiI/OrIu10kMRDhHSgkCL61K7Q/watch";
+      }, 20000);
+    });
+  </script>
+
+</body>
 </html>
