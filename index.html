@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chúc mừng sinh nhật 🎂</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: radial-gradient(circle, #ffe9f0, #ffd6e0);
+      text-align: center;
+    }
+    h1 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ff0055;
+      font-size: 2em;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    #music {
+      display: none;
+    }
+    #ar-button {
+      margin-top: 40vh;
+      background: #ff4081;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 30px;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #ar-button:hover {
+      background: #ff0055;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <h1 id="message">Chúc mừng sinh nhật 🎉</h1>
+
+  <!-- Nút mở AR -->
+  <a rel="ar" href="giftbox.usdz" id="ar-link">
+    <button id="ar-button">Mở hộp quà 🎁</button>
+  </a>
+
+  <audio id="music" src="music.mp3"></audio>
+
+  <script>
+    const arLink = document.getElementById('ar-link');
+    const message = document.getElementById('message');
+    const music = document.getElementById('music');
+
+    // Khi người dùng nhấn vào nút AR
+    arLink.addEventListener('click', () => {
+      // Sau 3 giây (giả lập lúc mở hộp xong)
+      setTimeout(() => {
+        message.style.opacity = 1;
+        music.play().catch(() => {
+          console.warn('Không thể tự động phát nhạc, cần chạm thêm lần nữa.');
+        });
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
