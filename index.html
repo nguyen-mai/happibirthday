@@ -1,75 +1,199 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chúc mừng sinh nhật 🎂</title>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   <style>
     body {
       margin: 0;
-      background: radial-gradient(circle, #ffe9f0, #ffd6e0);
       overflow: hidden;
-      font-family: sans-serif;
+      background: radial-gradient(circle, #ffe9f0, #ffd6e0);
+      font-family: 'Poppins', sans-serif;
     }
 
     model-viewer {
       width: 100vw;
       height: 100vh;
-      background: transparent;
+      background-color: transparent;
+      transition: filter 1.5s ease, transform 1.5s ease;
     }
 
-    /* Nút mở AR (hiện riêng cho iOS) */
+    .glow {
+      filter: drop-shadow(0 0 30px #ff99cc) drop-shadow(0 0 60px #ff66aa)
+              drop-shadow(0 0 90px #ff33aa);
+      transform: scale(1.05);
+    }
+
+    #video-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+    }
+
+    #video-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: black;
+    }
+
+    canvas.fireworks {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* ✅ Nút mở AR */
     #ar-button {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: #ff4081;
+      background-color: #ff4081;
       color: white;
       border: none;
-      padding: 14px 24px;
-      border-radius: 25px;
-      font-size: 1em;
-      font-weight: bold;
+      padding: 15px 20px;
+      border-radius: 12px;
+      font-size: 16px;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s ease;
-      display: none;
-      z-index: 20;
+      z-index: 30;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      transition: 0.3s;
+      display: none; /* Mặc định ẩn, chỉ hiện khi là iOS */
     }
 
     #ar-button:hover {
-      background: #ff0055;
-      transform: scale(1.05);
+      background-color: #ff79a7;
     }
   </style>
 </head>
 <body>
-
-  <!-- Mô hình 3D (cho Android & web) -->
   <model-viewer
+    id="giftModel"
     src="https://cdn.jsdelivr.net/gh/nguyen-mai/happibirthday/giftbox.glb"
     camera-controls
     auto-rotate
     ar
-    ar-modes="webxr scene-viewer"
     shadow-intensity="1"
-    alt="Gift Box 3D">
+    exposure="1.2"
+    alt="Gift Box">
   </model-viewer>
 
-  <!-- Nút mở AR (riêng cho iOS) -->
-  <a rel="ar" href="https://cdn.jsdelivr.net/gh/nguyen-mai/happibirthday/giftbox.usdz">
+  <canvas class="fireworks"></canvas>
+
+  <div id="video-container">
+    <video id="birthdayVideo" src="https://cdn.jsdelivr.net/gh/nguyen-mai/happibirthday/video.mp4" controls></video>
+  </div>
+
+  <audio id="fireworkSound" src="https://cdn.jsdelivr.net/gh/naptha/tiny-sfx/firework.mp3" preload="auto"></audio>
+
+  <!-- ✅ Nút mở AR -->
+  <a rel="ar" href="https://nguyen-mai.github.io/happibirthday/giftbox.usdz" id="ar-link">
     <button id="ar-button">Mở hộp quà 🎁</button>
   </a>
 
   <script>
-    // Phát hiện iOS (iPhone, iPad)
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const model = document.getElementById('giftModel');
+    const videoContainer = document.getElementById('video-container');
+    const video = document.getElementById('birthdayVideo');
+    const canvas = document.querySelector('.fireworks');
+    const ctx = canvas.getContext('2d');
+    const fireworkSound = document.getElementById('fireworkSound');
+    const arButton = document.getElementById('ar-button');
 
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+    // ✅ Hiện nút AR nếu là iOS
     if (isIOS) {
-      document.getElementById('ar-button').style.display = 'block';
+      arButton.style.display = 'block';
     }
-  </script>
 
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function createFirework(x, y) {
+      const colors = [0, 60, 120, 180, 240, 300];
+      const hue = colors[Math.floor(Math.random() * colors.length)];
+      for (let i = 0; i < 120; i++) {
+        particles.push({
+          x, y,
+          angle: Math.random() * 2 * Math.PI,
+          speed: Math.random() * 8 + 3,
+          radius: Math.random() * 3 + 1,
+          alpha: 1,
+          decay: Math.random() * 0.015 + 0.005,
+          hue: hue + Math.random() * 60 - 30,
+          brightness: Math.random() * 50 + 50
+        });
+      }
+    }
+
+    function animateFireworks() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p, i) => {
+        p.x += Math.cos(p.angle) * p.speed;
+        p.y += Math.sin(p.angle) * p.speed + 0.3;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) particles.splice(i, 1);
+        else {
+          const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 6);
+          grad.addColorStop(0, `hsla(${p.hue}, 100%, ${p.brightness}%, ${p.alpha})`);
+          grad.addColorStop(1, `hsla(${p.hue}, 100%, 20%, 0)`);
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius * 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+      requestAnimationFrame(animateFireworks);
+    }
+    animateFireworks();
+
+    function explodeFireworks() {
+      for (let i = 0; i < 10; i++) {
+        createFirework(Math.random() * canvas.width, Math.random() * canvas.height / 2);
+      }
+      fireworkSound.currentTime = 0;
+      fireworkSound.play().catch(() => {});
+    }
+
+    // Khi click vào hộp quà
+    model.addEventListener('click', () => {
+      model.classList.add('glow');
+      explodeFireworks();
+
+      setTimeout(() => {
+        model.style.display = 'none';
+        videoContainer.style.display = 'flex';
+        video.play();
+      }, 2000);
+    });
+
+    // Khi video kết thúc
+    video.addEventListener('ended', () => {
+      videoContainer.style.display = 'none';
+      model.style.display = 'block';
+      model.classList.remove('glow');
+      explodeFireworks();
+    });
+  </script>
 </body>
 </html>
