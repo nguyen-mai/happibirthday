@@ -1,103 +1,88 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chúc mừng sinh nhật 🎂</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mở hộp quà 🎁</title>
 
-  <!-- Thư viện hiển thị 3D + AR -->
+  <!-- Thư viện model-viewer -->
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
   <style>
     body {
       margin: 0;
-      overflow: hidden;
-      font-family: sans-serif;
       background: radial-gradient(circle, #ffe9f0, #ffd6e0);
       text-align: center;
+      font-family: sans-serif;
+      overflow: hidden;
     }
     h1 {
       color: #ff0055;
-      margin-top: 2vh;
-      font-size: 2em;
+      margin-top: 20px;
       animation: fadeIn 2s ease;
     }
-    model-viewer {
+    model-viewer, video {
       width: 100vw;
-      height: 80vh;
-      background: transparent;
-      --poster-color: transparent;
-    }
-    #ar-button {
-      background: #ff4081;
-      color: white;
+      height: 90vh;
       border: none;
-      padding: 15px 30px;
-      border-radius: 30px;
-      font-size: 1.2em;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-bottom: 4vh;
+      outline: none;
+      background: none;
     }
-    #ar-button:hover {
-      background: #ff0055;
-      transform: scale(1.05);
+    video {
+      display: none;
+      object-fit: cover;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    @keyframes popLid {
+      0% { transform: rotateX(0deg); }
+      100% { transform: rotateX(-60deg); }
+    }
   </style>
 </head>
-
 <body>
+
   <h1>Chúc mừng sinh nhật 🎉</h1>
 
-  <!-- Mô hình 3D -->
+  <!-- Hộp quà 3D -->
   <model-viewer
     id="giftModel"
     src="https://cdn.jsdelivr.net/gh/nguyen-mai/happibirthday/giftbox.glb"
-    alt="Hộp quà sinh nhật"
     camera-controls
-    ar
-    ar-modes="webxr scene-viewer quick-look"
-    auto-rotate
-    exposure="1"
+    autoplay
+    shadow-intensity="1"
+    alt="Hộp quà sinh nhật"
   ></model-viewer>
 
-  <!-- Nút kích hoạt AR -->
-  <button id="ar-button">Xem hộp quà AR 🎁</button>
-
-  <!-- Âm nhạc -->
-  <audio id="music" src="https://cdn.jsdelivr.net/gh/nguyen-mai/happibirthday/music.mp3"></audio>
+  <!-- Video chúc mừng -->
+  <video id="video" src="https://cdn.jsdelivr.net/gh/nguyen-mai/happibirthday/video.mp4" controls></video>
 
   <script>
-    const modelViewer = document.getElementById('giftModel');
-    const arButton = document.getElementById('ar-button');
-    const music = document.getElementById('music');
+    const model = document.getElementById("giftModel");
+    const video = document.getElementById("video");
+    const title = document.querySelector("h1");
 
-    // Khi nhấn nút xem AR
-    arButton.addEventListener('click', () => {
-      // Phát nhạc
-      music.play().catch(() => console.warn('Autoplay bị chặn, sẽ phát khi người dùng tương tác.'));
-      // Mở AR
-      modelViewer.activateAR();
-    });
+    let isOpened = false;
 
-    // Khi người dùng chạm vào mô hình (trong 3D)
-    modelViewer.addEventListener('click', () => {
-      music.pause();
-      window.location.href = "https://cdn.jsdelivr.net/gh/nguyen-mai/happibirthday/video.mp4";
-    });
+    model.addEventListener("click", () => {
+      if (isOpened) return;
+      isOpened = true;
 
-    // Sau 20s (giả lập người dùng xem AR xong)
-    modelViewer.addEventListener('ar-status', (event) => {
-      if (event.detail.status === 'session-started') {
-        setTimeout(() => {
-          window.location.href = "https://cdn.jsdelivr.net/gh/nguyen-mai/happibirthday/video.mp4";
-        }, 20000); // 20s
-      }
+      // Hiệu ứng mô phỏng mở nắp hộp (dùng CSS tạm)
+      model.style.transition = "transform 1s ease-out";
+      model.style.transform = "scale(1.1) rotateX(10deg)";
+
+      // Sau 1.5 giây, ẩn mô hình và phát video
+      setTimeout(() => {
+        model.style.display = "none";
+        title.style.display = "none";
+        video.style.display = "block";
+        video.play();
+      }, 1500);
     });
   </script>
+
 </body>
 </html>
