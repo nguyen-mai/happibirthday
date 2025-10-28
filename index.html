@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chúc mừng sinh nhật 🎂</title>
 
-  <!-- Thư viện Model Viewer -->
+  <!-- Thư viện hiển thị 3D + AR -->
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
   <style>
@@ -16,21 +16,18 @@
       background: radial-gradient(circle, #ffe9f0, #ffd6e0);
       text-align: center;
     }
-
     h1 {
       color: #ff0055;
       margin-top: 2vh;
       font-size: 2em;
       animation: fadeIn 2s ease;
     }
-
     model-viewer {
       width: 100vw;
       height: 80vh;
       background: transparent;
       --poster-color: transparent;
     }
-
     #ar-button {
       background: #ff4081;
       color: white;
@@ -42,12 +39,10 @@
       transition: all 0.3s ease;
       margin-bottom: 4vh;
     }
-
     #ar-button:hover {
       background: #ff0055;
       transform: scale(1.05);
     }
-
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -56,45 +51,53 @@
 </head>
 
 <body>
-
   <h1>Chúc mừng sinh nhật 🎉</h1>
 
-  <!-- Hiển thị mô hình 3D -->
+  <!-- Mô hình 3D -->
   <model-viewer
     id="giftModel"
-    src="https://github.com/nguyen-mai/happibirthday/raw/main/giftbox.glb"
+    src="https://cdn.jsdelivr.net/gh/nguyen-mai/happibirthday/giftbox.glb"
     alt="Hộp quà sinh nhật"
     camera-controls
     ar
     ar-modes="webxr scene-viewer quick-look"
-    exposure="1"
     auto-rotate
-    interaction-prompt="none"
+    exposure="1"
   ></model-viewer>
 
+  <!-- Nút kích hoạt AR -->
   <button id="ar-button">Xem hộp quà AR 🎁</button>
 
-  <audio id="music" src="music.mp3"></audio>
+  <!-- Âm nhạc -->
+  <audio id="music" src="https://cdn.jsdelivr.net/gh/nguyen-mai/happibirthday/music.mp3"></audio>
 
   <script>
     const modelViewer = document.getElementById('giftModel');
     const arButton = document.getElementById('ar-button');
     const music = document.getElementById('music');
 
-    // Khi người dùng nhấn nút mở AR
+    // Khi nhấn nút xem AR
     arButton.addEventListener('click', () => {
+      // Phát nhạc
+      music.play().catch(() => console.warn('Autoplay bị chặn, sẽ phát khi người dùng tương tác.'));
+      // Mở AR
       modelViewer.activateAR();
-      music.play().catch(() => {
-        console.warn('Autoplay bị chặn, người dùng cần chạm để phát.');
-      });
     });
 
-    // Khi người dùng tap vào hộp quà
+    // Khi người dùng chạm vào mô hình (trong 3D)
     modelViewer.addEventListener('click', () => {
       music.pause();
-      window.location.href = "https://github.com/nguyen-mai/happibirthday/raw/main/video.mp4";
+      window.location.href = "https://cdn.jsdelivr.net/gh/nguyen-mai/happibirthday/video.mp4";
+    });
+
+    // Sau 20s (giả lập người dùng xem AR xong)
+    modelViewer.addEventListener('ar-status', (event) => {
+      if (event.detail.status === 'session-started') {
+        setTimeout(() => {
+          window.location.href = "https://cdn.jsdelivr.net/gh/nguyen-mai/happibirthday/video.mp4";
+        }, 20000); // 20s
+      }
     });
   </script>
-
 </body>
 </html>
