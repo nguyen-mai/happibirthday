@@ -71,7 +71,7 @@
       z-index: 30;
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       transition: 0.3s;
-      display: none; /* Mặc định ẩn, chỉ hiện khi là iOS */
+      display: none; /* chỉ hiện trên iOS */
     }
 
     #ar-button:hover {
@@ -99,7 +99,7 @@
 
   <audio id="fireworkSound" src="https://cdn.jsdelivr.net/gh/naptha/tiny-sfx/firework.mp3" preload="auto"></audio>
 
-  <!-- ✅ Nút mở AR -->
+  <!-- ✅ Nút mở AR chỉ hiện ở iOS -->
   <a rel="ar" href="https://nguyen-mai.github.io/happibirthday/giftbox.usdz" id="ar-link">
     <button id="ar-button">Mở hộp quà 🎁</button>
   </a>
@@ -115,7 +115,7 @@
 
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-    // ✅ Hiện nút AR nếu là iOS
+    // ✅ Hiện nút AR nếu là iOS, nhưng vẫn hiển thị mô hình như bình thường
     if (isIOS) {
       arButton.style.display = 'block';
     }
@@ -175,7 +175,6 @@
       fireworkSound.play().catch(() => {});
     }
 
-    // Khi click vào hộp quà
     model.addEventListener('click', () => {
       model.classList.add('glow');
       explodeFireworks();
@@ -187,7 +186,6 @@
       }, 2000);
     });
 
-    // Khi video kết thúc
     video.addEventListener('ended', () => {
       videoContainer.style.display = 'none';
       model.style.display = 'block';
