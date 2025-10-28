@@ -4,22 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chúc mừng sinh nhật 🎂</title>
+
+  <!-- Thư viện Model Viewer -->
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
   <style>
     body {
       margin: 0;
+      overflow: hidden;
       font-family: sans-serif;
       background: radial-gradient(circle, #ffe9f0, #ffd6e0);
       text-align: center;
-      overflow: hidden;
     }
+
     h1 {
       color: #ff0055;
-      margin-top: 5vh;
+      margin-top: 2vh;
       font-size: 2em;
       animation: fadeIn 2s ease;
     }
+
+    model-viewer {
+      width: 100vw;
+      height: 80vh;
+      background: transparent;
+      --poster-color: transparent;
+    }
+
     #ar-button {
-      margin-top: 40vh;
       background: #ff4081;
       color: white;
       border: none;
@@ -28,44 +40,59 @@
       font-size: 1.2em;
       cursor: pointer;
       transition: all 0.3s ease;
+      margin-bottom: 4vh;
     }
+
     #ar-button:hover {
       background: #ff0055;
       transform: scale(1.05);
     }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
+
 <body>
 
   <h1>Chúc mừng sinh nhật 🎉</h1>
 
-  <!-- Nút mở mô hình AR -->
-  <a rel="ar" href="giftbox.usdz" id="ar-link">
-    <button id="ar-button">Mở hộp quà 🎁</button>
-  </a>
+  <!-- Hiển thị mô hình 3D -->
+  <model-viewer
+    id="giftModel"
+    src="https://github.com/nguyen-mai/happibirthday/raw/main/giftbox.glb"
+    alt="Hộp quà sinh nhật"
+    camera-controls
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    exposure="1"
+    auto-rotate
+    interaction-prompt="none"
+  ></model-viewer>
 
-  <!-- Âm nhạc tùy chọn -->
+  <button id="ar-button">Xem hộp quà AR 🎁</button>
+
   <audio id="music" src="music.mp3"></audio>
 
   <script>
-    const arLink = document.getElementById('ar-link');
+    const modelViewer = document.getElementById('giftModel');
+    const arButton = document.getElementById('ar-button');
     const music = document.getElementById('music');
 
-    arLink.addEventListener('click', () => {
-      // Phát nhạc nhẹ khi mở AR
+    // Khi người dùng nhấn nút mở AR
+    arButton.addEventListener('click', () => {
+      modelViewer.activateAR();
       music.play().catch(() => {
-        console.warn('⚠️ Autoplay bị chặn — nhạc sẽ phát sau khi người dùng tương tác.');
+        console.warn('Autoplay bị chặn, người dùng cần chạm để phát.');
       });
+    });
 
-      // Khi người dùng đóng Quick Look (AR), trang web sẽ trở lại.
-      // Ta kiểm tra thời gian 20s, nếu quay lại thì redirect.
-      setTimeout(() => {
-        window.location.href = "https://www.canva.com/design/DAG2_6J5SiI/OrIu10kMRDhHSgkCL61K7Q/watch";
-      }, 20000); // 20 giây
+    // Khi người dùng tap vào hộp quà
+    modelViewer.addEventListener('click', () => {
+      music.pause();
+      window.location.href = "https://github.com/nguyen-mai/happibirthday/raw/main/video.mp4";
     });
   </script>
 
