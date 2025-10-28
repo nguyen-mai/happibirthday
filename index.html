@@ -1,149 +1,150 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mở hộp quà 🎁</title>
-
-  <!-- Thư viện model-viewer -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chúc mừng sinh nhật 🎂</title>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-
   <style>
     body {
       margin: 0;
-      background: radial-gradient(circle, #ffe9f0, #ffd6e0);
-      text-align: center;
-      font-family: sans-serif;
       overflow: hidden;
+      background: radial-gradient(circle, #ffe9f0, #ffd6e0);
     }
-    h1 {
-      color: #ff0055;
-      margin-top: 20px;
-      animation: fadeIn 2s ease;
-    }
-    model-viewer, video, canvas {
+
+    model-viewer {
       width: 100vw;
-      height: 90vh;
-      border: none;
-      outline: none;
-      background: none;
+      height: 100vh;
+      background-color: transparent;
     }
-    video {
-      display: none;
-      object-fit: cover;
-    }
-    canvas {
+
+    #video-container {
       position: fixed;
       top: 0;
       left: 0;
-      pointer-events: none;
-      z-index: 5;
+      width: 100%;
+      height: 100%;
+      background: black;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+
+    #video-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: black;
+    }
+
+    canvas.fireworks {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
     }
   </style>
 </head>
 <body>
 
-  <h1>Chúc mừng sinh nhật 🎉</h1>
-
-  <!-- Hộp quà 3D -->
+  <!-- Mô hình hộp quà -->
   <model-viewer
     id="giftModel"
     src="https://cdn.jsdelivr.net/gh/nguyen-mai/happibirthday/giftbox.glb"
     camera-controls
-    autoplay
+    auto-rotate
+    ar
     shadow-intensity="1"
-    alt="Hộp quà sinh nhật"
-  ></model-viewer>
+    exposure="1.2"
+    alt="Gift Box">
+  </model-viewer>
 
   <!-- Canvas pháo hoa -->
-  <canvas id="fireworks"></canvas>
+  <canvas class="fireworks"></canvas>
 
-  <!-- Video chúc mừng -->
-  <video id="video" src="https://cdn.jsdelivr.net/gh/nguyen-mai/happibirthday/video.mp4" controls></video>
+  <!-- Video -->
+  <div id="video-container">
+    <video id="birthdayVideo" src="https://cdn.jsdelivr.net/gh/nguyen-mai/happibirthday/video.mp4" controls></video>
+  </div>
 
   <script>
-    const model = document.getElementById("giftModel");
-    const video = document.getElementById("video");
-    const title = document.querySelector("h1");
-    const canvas = document.getElementById("fireworks");
-    const ctx = canvas.getContext("2d");
+    const model = document.getElementById('giftModel');
+    const videoContainer = document.getElementById('video-container');
+    const video = document.getElementById('birthdayVideo');
+    const canvas = document.querySelector('.fireworks');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
 
-    let isOpened = false;
-    let fireworks = [];
-
-    // Cập nhật kích thước canvas khi thay đổi màn hình
+    // Cập nhật kích thước canvas
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Hiệu ứng pháo hoa đơn giản
+    // 🎆 Hàm tạo pháo hoa
     function createFirework(x, y) {
       for (let i = 0; i < 60; i++) {
-        fireworks.push({
+        particles.push({
           x, y,
           angle: Math.random() * 2 * Math.PI,
           speed: Math.random() * 5 + 2,
           radius: Math.random() * 2 + 1,
-          color: `hsl(${Math.random() * 360}, 100%, 60%)`,
-          alpha: 1
+          alpha: 1,
+          decay: Math.random() * 0.02 + 0.01,
+          color: `hsl(${Math.random() * 360}, 100%, 60%)`
         });
       }
     }
 
-    function updateFireworks() {
+    // Cập nhật hiệu ứng pháo hoa
+    function animateFireworks() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      fireworks.forEach(fw => {
-        fw.x += Math.cos(fw.angle) * fw.speed;
-        fw.y += Math.sin(fw.angle) * fw.speed;
-        fw.alpha -= 0.02;
-        ctx.beginPath();
-        ctx.arc(fw.x, fw.y, fw.radius, 0, 2 * Math.PI);
-        ctx.fillStyle = `rgba(${hexToRgb(fw.color)},${fw.alpha})`;
-        ctx.fill();
+      particles.forEach((p, i) => {
+        p.x += Math.cos(p.angle) * p.speed;
+        p.y += Math.sin(p.angle) * p.speed;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) particles.splice(i, 1);
+        else {
+          ctx.globalAlpha = p.alpha;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+        }
       });
-      fireworks = fireworks.filter(fw => fw.alpha > 0);
-      requestAnimationFrame(updateFireworks);
+      requestAnimationFrame(animateFireworks);
     }
+    animateFireworks();
 
-    function hexToRgb(hsl) {
-      // convert hsl(...) string to rgb for rgba()
-      const canvasTemp = document.createElement("canvas");
-      const ctxTemp = canvasTemp.getContext("2d");
-      ctxTemp.fillStyle = hsl;
-      return ctxTemp.fillStyle.match(/\d+/g).slice(0, 3).join(",");
-    }
-
-    updateFireworks();
-
-    model.addEventListener("click", (event) => {
-      if (isOpened) return;
-      isOpened = true;
-
-      // Tạo pháo hoa tại giữa màn hình
-      for (let i = 0; i < 5; i++) {
-        setTimeout(() => createFirework(window.innerWidth/2, window.innerHeight/2), i * 200);
+    // Khi tap vào hộp quà 🎁
+    model.addEventListener('click', (e) => {
+      // Tạo pháo hoa tại vị trí ngẫu nhiên
+      for (let i = 0; i < 6; i++) {
+        createFirework(
+          Math.random() * canvas.width,
+          Math.random() * canvas.height / 2
+        );
       }
 
-      // Hiệu ứng phóng to hộp quà
-      model.style.transition = "transform 1s ease-out";
-      model.style.transform = "scale(1.1) rotateX(10deg)";
-
-      // Sau 3s thì ẩn hộp, hiện video
+      // Sau 2s hiển thị video
       setTimeout(() => {
-        model.style.display = "none";
-        title.style.display = "none";
-        video.style.display = "block";
+        model.style.display = 'none';
+        videoContainer.style.display = 'flex';
         video.play();
-      }, 3000);
+      }, 2000);
+    });
+
+    // Khi video chạy xong, quay lại mô hình
+    video.addEventListener('ended', () => {
+      videoContainer.style.display = 'none';
+      model.style.display = 'block';
     });
   </script>
-
 </body>
 </html>
